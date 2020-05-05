@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`reserveNameCompose essential for any decorator in the chain to access targetFunction.name if it is not on the first place 1`] = `
+Array [
+  Array [
+    Object {
+      "event": "original",
+    },
+    "original",
+  ],
+]
+`;
+
+exports[`reserveNameCompose essential for any decorator in the chain to access targetFunction.name if it is not on the first place 2`] = `Array []`;

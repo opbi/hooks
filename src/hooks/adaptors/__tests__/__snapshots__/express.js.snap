@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adaptorExpress can add additional adaption via config 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`adaptorExpress can add additional adaption via config 2`] = `
+Array [
+  Array [
+    "validation passed",
+    Object {
+      "requestId": "57cec994-ea1e-4555-81d6-45de628c3af9",
+    },
+  ],
+]
+`;
+
+exports[`adaptorExpress chainable with hooks 1`] = `
+Array [
+  Array [
+    1,
+  ],
+]
+`;
+
+exports[`adaptorExpress chainable with hooks 2`] = `
+Array [
+  Array [
+    Object {
+      "event": "handlerAction",
+      "requestId": "57cec994-ea1e-4555-81d6-45de628c3af9",
+    },
+    "handlerAction",
+  ],
+]
+`;
+
+exports[`adaptorExpress has default pattern to adapt action to express function 1`] = `
+Array [
+  Array [
+    1,
+  ],
+]
+`;

@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`addHooks bypass hooks when bypassHook condition met 1`] = `
+Array [
+  Array [
+    "original",
+  ],
+]
+`;
+
+exports[`addHooks decorate input function with hooks and fire them in right order 1`] = `
+Array [
+  Array [
+    "beforeHook",
+  ],
+  Array [
+    "original",
+  ],
+  Array [
+    "afterHook",
+  ],
+]
+`;
+
+exports[`addHooks fire beforeHook and errorHook when throws an error 1`] = `
+Array [
+  Array [
+    "beforeHook",
+  ],
+  Array [
+    "original",
+  ],
+  Array [
+    "errorHook",
+  ],
+]
+`;

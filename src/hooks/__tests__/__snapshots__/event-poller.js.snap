@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`eventPoller return data combined from multi polling responses 1`] = `
+Array [
+  Object {
+    "finished": false,
+    "value": "no",
+  },
+  Object {
+    "finished": false,
+    "value": "no",
+  },
+  Object {
+    "finished": true,
+    "value": "yes",
+  },
+]
+`;
