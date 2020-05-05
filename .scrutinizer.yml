@@ -1,0 +1,12 @@
+---
+build:
+  nodes:
+    analysis:
+      # disable inferred commands [dependencies]
+      dependencies:
+        override:
+          - true
+      # as we're only use the code quality analyser
+      tests:
+        override:
+          - js-scrutinizer-run

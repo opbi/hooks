@@ -1,0 +1,47 @@
+---
+parser: babel-eslint
+parserOptions:
+  ecmaVersion: 6
+  sourceType: module
+env:
+  browser: true
+  es6: true
+  node: true
+  jest/globals: true
+extends:
+  - airbnb-base
+  - plugin:jest/recommended
+  - plugin:jsdoc/recommended
+  - plugin:prettier/recommended
+plugins:
+  - import
+  - jest
+  - jsdoc
+  - prettier
+rules:
+  valid-jsdoc: 'off'
+  jsdoc/check-types: 'off'
+  jsdoc/require-param: 'off'
+  jsdoc/require-returns: 'off'
+  import/extensions: [warn, {js: never}]
+  import/no-extraneous-dependencies: 'off'
+  import/no-named-as-default: 'off'
+  jest/no-disabled-tests: warn
+  jest/no-focused-tests: error
+  jest/no-identical-title: error
+  jest/no-try-expect: 'off'
+  jest/valid-expect: error
+  prettier/prettier:
+    - error
+    - {
+      singleQuote: true,
+      trailingComma: all
+    }
+settings:
+  import/resolver:
+    node:
+      moduleDirectory:
+        - ./src
+        - ./node_modules
+  jsdoc:
+    mode: typescript

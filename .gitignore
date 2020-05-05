@@ -1,0 +1,31 @@
+# dependencies
+/node_modules/
+
+# test output
+coverage/
+reports/
+
+# dist
+dist/
+types/
+
+# docs output
+docs/
+
+# build cache
+.cache
+.serverless
+.webpack
+.build
+*_book
+
+# dot files
+.DS_Store
+*.env*
+package-lock.json
+
+# log files
+*.log
+
+# data file
+output/

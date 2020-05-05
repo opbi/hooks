@@ -1,0 +1,17 @@
+## created by @opbi/ncm
+---
+component:
+  type: package
+  name: hooks
+  description: ''
+  keywords: ''
+  private: false
+package:
+  environment: node
+  npmScope: opbi
+owner:
+  type: organisation
+  github: opbi
+  team: ''
+  name: ''
+  email: engineering@opbi.org

@@ -1,0 +1,63 @@
+---
+version: 2
+
+references:
+  container-config-node8: &container-config-node8
+    docker:
+      - image: circleci/node:dubnium
+  restore-deps-cache: &restore-deps-cache
+    restore_cache:
+      keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+  save-deps-cache: &save-deps-cache
+    save_cache:
+      key: yarn-packages-{{ checksum "yarn.lock" }}
+      paths:
+        - ~/.cache/yarn
+        - node_modules
+jobs:
+  install:
+    <<: *container-config-node8
+    steps:
+      - checkout
+      - *restore-deps-cache
+      - run:
+          name: Install Dependencies
+          command: make install
+      - *save-deps-cache
+  test:
+    <<: *container-config-node8
+    steps:
+      - checkout
+      - *restore-deps-cache
+      - run:
+          name: Install Dependencies and Run Test Coverage
+          command: make install test-coverage
+      - *save-deps-cache
+      - run: npx coveralls < coverage/lcov.info
+  release:
+    <<: *container-config-node8
+    steps:
+      - checkout
+      - *restore-deps-cache
+      - run:
+          name: Build Package and Semantic-Release
+          command: make install build release
+      - run:
+          name: Update Doc GitHub Page
+          command: sh .circleci/update-github-page.sh
+
+workflows:
+  version: 2
+  test-and-release:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: gh-pages
+      - release:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master

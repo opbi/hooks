@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`example would fail if constant types corrupt 1`] = `"function validation failed"`;
