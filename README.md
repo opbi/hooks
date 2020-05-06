@@ -41,7 +41,42 @@
 
 ### Purpose
 
-##### Readability, Reusability, Testability (RRT)
+#### Consistency as Toolings (CasT)
+
+> what to observability and control patterns, like linters to code styles
+
+By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services, codebases or teams.
+
+```js
+/* handler.js */
+import logger, metrics from '@opbi/toolchain';
+import { eventLogger, eventTimer } from '@opbi/hooks';
+
+const withObserver = chain(eventLogger, eventTimer);
+const getSubscription = withObserver(userProfileApi.getSubscription);
+const cancelSubscription = withObserver(subscriptionApi.cancel)
+
+const handleUserCancelSubscription = async ({ userId }, meta, context) => {
+  const { subscriptionId } = await getSubscription( { userId }, meta, context );
+  await cancelSubscription({ subscriptionId }, meta, context);
+};
+
+export default withObserver(handleUserCancelSubscription);
+
+/* router.js */
+import handleUserCancelSubscription from './handler.js';
+
+await handleUserCancelSubscription({ userId }, meta, { logger, metrics });
+```
+Hooks can automate standardised log, metrics and tracing in a structure reflecting the call stacks. This greatly improves observability coverage and makes monitor and debugging a breeze with good precision locating problematic function.
+
+```shell
+[info] event: handleUserCancelSubscription
+[info] event: handleUserCancelSubscription.getSubscription
+[error] event: handleUserCancelSubscription.cancelSubscription, type: TimeoutError
+```
+
+#### Readability, Reusability, Testability (RRT)
 
 Turn scattered repeatitive control mechanism or observability code from interwined blocks to more readable, reusable, testable ones.
 
@@ -121,42 +156,6 @@ const cancelSubscription = async ({ userId }, meta, context) => {
 };
 
 // export default cancelSubscription;
-```
-
-
-##### Consistency as Toolings (CasT)
-
-> what to observability and control patterns, like linters to code styles
-
-By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services, codebases or teams.
-
-```js
-/* handler.js */
-import logger, metrics from '@opbi/toolchain';
-import { eventLogger, eventTimer } from '@opbi/hooks';
-
-const withObserver = chain(eventLogger, eventTimer);
-const getSubscription = withObserver(userProfileApi.getSubscription);
-const cancelSubscription = withObserver(subscriptionApi.cancel)
-
-const handleUserCancelSubscription = async ({ userId }, meta, context) => {
-  const { subscriptionId } = await getSubscription( { userId }, meta, context );
-  await cancelSubscription({ subscriptionId }, meta, context);
-};
-
-export default withObserver(handleUserCancelSubscription);
-
-/* router.js */
-import handleUserCancelSubscription from './handler.js';
-
-await handleUserCancelSubscription({ userId }, meta, { logger, metrics });
-```
-Hooks can automate standardised log, metrics and tracing in a structure reflecting the call stacks. This greatly improves observability coverage and makes monitor and debugging a breeze with good precision locating problematic function.
-
-```shell
-[info] event: handleUserCancelSubscription
-[info] event: handleUserCancelSubscription.getSubscription
-[error] event: handleUserCancelSubscription.cancelSubscription, type: TimeoutError
 ```
 
 ---
