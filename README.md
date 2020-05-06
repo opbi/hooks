@@ -185,7 +185,7 @@ function (param, meta, context) {}
 
 All the hooks in @opbi/hooks are configurable with possible default settings.
 
-In the [cancelSubscription](#purpose) example, *errorRetry()* is using its default settings, while *restoreOnServerError* is configured *errorHandler*. Descriptive names of hook configurations help to make the behaviour very self-explanatory. Patterns composed of configured hooks can certainly be reused.
+In the [cancelSubscription](##readability-reusability-testability-rrt) example, *errorRetry()* is using its default settings, while *restoreOnServerError* is configured *errorHandler*. Descriptive names of hook configurations help to make the behaviour very self-explanatory. Patterns composed of configured hooks can certainly be reused.
 
 ```js
 const restoreOnServerError = errorHandler({
@@ -202,7 +202,7 @@ const restoreOnServerError = errorHandler({
   <img alt="decorators" width="640" src="https://innolitics.com/img/javascript-decorators.png"/>
 </a>
 
-Under the hood, the hooks are implemented in the [decorators](https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions) pattern. The pre-hooks, action function, after-hooks/error-hooks are invoked in a pattern as illustrated above. In the [cancelSubscription](#purpose) example, as *errorRetry(), restoreOnServerError* are all error hooks, *restoreOnServerError* will be invoked first before *errorRetry* is invoked.
+Under the hood, the hooks are implemented in the [decorators](https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions) pattern. The pre-hooks, action function, after-hooks/error-hooks are invoked in a pattern as illustrated above. In the [cancelSubscription](##readability-reusability-testability-rrt) example, as *errorRetry(), restoreOnServerError* are all error hooks, *restoreOnServerError* will be invoked first before *errorRetry* is invoked.
 
 ---
 #### Ecosystem
@@ -252,7 +252,7 @@ const handler = chain(
 handler(req, res, next);
 ```
 #### Refactor
-To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/hooks/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
+To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
 
 #### Reducers
 Integration with Redux is TBC.
