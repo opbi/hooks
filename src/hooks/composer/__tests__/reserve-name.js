@@ -4,7 +4,7 @@ import reserveName from '../reserve-name';
 
 const callOrder = jest.fn();
 
-const createMockDecorator = decoratorName => inputFunction => (...args) => {
+const createMockDecorator = (decoratorName) => (inputFunction) => (...args) => {
   callOrder(decoratorName);
   return inputFunction(...args);
 };

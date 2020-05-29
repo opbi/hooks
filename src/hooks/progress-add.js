@@ -1,4 +1,4 @@
-const progressAdd = valueFunction => action => async (
+const progressAdd = (valueFunction) => (action) => async (
   param,
   meta = {},
   context = {},

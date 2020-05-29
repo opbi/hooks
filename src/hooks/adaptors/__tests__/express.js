@@ -49,7 +49,7 @@ describe('adaptorExpress', () => {
     };
 
     const validateMiddleware = adaptorExpress({
-      context: req => ({ logger: req.logger }),
+      context: (req) => ({ logger: req.logger }),
     })(validateAction);
 
     const req = {
@@ -75,7 +75,7 @@ describe('adaptorExpress', () => {
     };
 
     const adaptorExpressWithLogger = adaptorExpress({
-      context: req => ({ logger: req.logger }),
+      context: (req) => ({ logger: req.logger }),
     });
     const handler = adaptorExpressWithLogger(eventLogger()(handlerAction));
 

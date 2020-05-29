@@ -20,7 +20,7 @@ import moment from 'moment';
 // it is not possible to pass the updated progress before inputFunction call
 // it is not recommended to position this decorator at this location
 
-const jobProgress = action => async (param, meta = {}, context = {}) => {
+const jobProgress = (action) => async (param, meta = {}, context = {}) => {
   const { job, progress } = context;
 
   if (!job || !progress) return action(param, meta, context);

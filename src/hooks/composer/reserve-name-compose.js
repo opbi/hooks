@@ -7,7 +7,7 @@ import reserveName from './reserve-name';
   so that action function name can be passed through the chain
  */
 const reserveNameCompose = (...args) => {
-  const enhancedArgs = args.map(arg => reserveName(arg));
+  const enhancedArgs = args.map((arg) => reserveName(arg));
   return compose(...enhancedArgs);
 };
 

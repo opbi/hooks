@@ -17,7 +17,7 @@ const setFunctionName = (targetFunction, name) => {
   used to enhance decorators to preserve the input function name
   reserveName(decorator)(inputFunction)(...args)
  */
-const reserveName = decorators => inputFunction =>
+const reserveName = (decorators) => (inputFunction) =>
   setFunctionName(decorators(inputFunction), inputFunction.name);
 
 export default reserveName;

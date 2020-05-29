@@ -15,7 +15,7 @@ import addHooks from './helpers/add-hooks';
  */
 const eventPoller = ({
   until,
-  mapping = res => res,
+  mapping = (res) => res,
   interval = 1000,
   timeout = 30 * 1000,
 } = {}) =>

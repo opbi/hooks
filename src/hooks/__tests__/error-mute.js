@@ -24,7 +24,7 @@ describe('errorMute', () => {
       throw e;
     };
     const decorated = errorMute({
-      condition: e => e.type === 'TimeoutError',
+      condition: (e) => e.type === 'TimeoutError',
     })(original);
 
     try {

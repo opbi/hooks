@@ -8,7 +8,7 @@ describe('eventPoller', () => {
       .mockReturnValueOnce({ finished: false, value: 'no' })
       .mockReturnValueOnce({ finished: true, value: 'yes' });
     const decorated = eventPoller({
-      until: result => result.finished,
+      until: (result) => result.finished,
     })(call);
     const data = await decorated();
     expect(data).toMatchSnapshot();
@@ -47,7 +47,7 @@ describe('eventPoller', () => {
       .mockReturnValueOnce('yes');
     const startTime = Date.now();
     const decorated = eventPoller({
-      until: result => result === 'yes',
+      until: (result) => result === 'yes',
       interval: 2 * 1000,
     })(original);
     await decorated();
@@ -62,7 +62,7 @@ describe('eventPoller', () => {
       .mockReturnValueOnce('no')
       .mockReturnValueOnce('yes');
     const decorated = eventPoller({
-      until: result => result === 'yes',
+      until: (result) => result === 'yes',
       interval: 2 * 1000,
       timeout: 2000,
     })(original);
@@ -81,7 +81,7 @@ describe('eventPoller', () => {
         throw Error('expected');
       });
     const decorated = eventPoller({
-      until: result => result === 'yes',
+      until: (result) => result === 'yes',
     })(original);
 
     try {

@@ -59,7 +59,7 @@ describe('eventLogger', () => {
       throw e;
     };
     const decorated = eventLogger({
-      errorParser: e => ({
+      errorParser: (e) => ({
         message: e.message,
         stack: e.stack.substring(0, 20),
       }),

@@ -17,7 +17,7 @@ const errorTag = ({
     action: a.name,
     message: e.message,
     constructor: e.constructor.name,
-    stack: e.stack.split('\n').map(s => s.trim()),
+    stack: e.stack.split('\n').map((s) => s.trim()),
   }),
 } = {}) =>
   addHooks({

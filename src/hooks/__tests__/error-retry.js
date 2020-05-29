@@ -30,7 +30,7 @@ describe('errorRetry', () => {
       .mockImplementationOnce(() => {
         throw Error('error');
       });
-    const condition = e => e.message === 'timeout';
+    const condition = (e) => e.message === 'timeout';
     const decorated = errorRetry({
       condition,
       maxRetries: 2,
@@ -51,7 +51,7 @@ describe('errorRetry', () => {
       .mockImplementationOnce(() => {
         return 'yes';
       });
-    const condition = e => e.message === 'timeout';
+    const condition = (e) => e.message === 'timeout';
     const decorated = errorRetry({
       condition,
     })(original);
@@ -68,7 +68,7 @@ describe('errorRetry', () => {
       .mockImplementationOnce(() => {
         return 'yes';
       });
-    const condition = e => e.message === 'timeout';
+    const condition = (e) => e.message === 'timeout';
     const startTime = Date.now();
     const decorated = errorRetry({
       condition,

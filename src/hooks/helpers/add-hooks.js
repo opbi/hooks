@@ -27,7 +27,7 @@ const addHooks = ({
   actionHook = (param, meta, context, action) => action(param, meta, context),
   afterHook = () => {},
   errorHook = () => {},
-} = {}) => action => async (param, meta = {}, context = {}) => {
+} = {}) => (action) => async (param, meta = {}, context = {}) => {
   if (bypassHook(param, meta, context)) return action(param, meta, context);
 
   const store = storeHook(param, meta, context, action);
