@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="hooks" src="https://raw.githubusercontent.com/opbi/logo/master/hooks/hooks.svg?sanitize=true" width="160">
+  <img alt="hooks" src="https://raw.githubusercontent.com/opbi/logo/master/hooks/hooks.svg" width="160">
 </p>
 
 <h3 align="center">hooks</h3>
