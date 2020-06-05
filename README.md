@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="hooks" src="https://raw.githubusercontent.com/opbi/logo/master/hooks/hooks.svg?sanitize=true" width="160">
+</p>
+
 <h3 align="center">hooks</h3>
 <p align="center" style="margin-bottom: 2em;"></p>
 
