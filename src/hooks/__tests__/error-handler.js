@@ -2,8 +2,8 @@ import errorHandler from '../error-handler';
 
 describe('errorHandler', () => {
   it('call side-effect before error thrown', async () => {
+    const error = { message: 'error' };
     const original = () => {
-      const error = { message: 'error' };
       throw error;
     };
     const handler = jest.fn();
