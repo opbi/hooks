@@ -1,7 +1,5 @@
 ---
 build:
-  environment:
-    node: v12.18
   nodes:
     analysis:
       # disable inferred commands [dependencies]
