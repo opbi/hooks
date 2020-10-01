@@ -14,16 +14,28 @@ import addHooks from './helpers/add-hooks';
  */
 const eventTimer = ({ parseLabel = () => {} } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').BypassHook}
+     */
     bypassHook: (p, m, { metrics }) => !metrics,
+    /**
+     * @type {import('./types').StoreHook}
+     */
     storeHook: (p, m, c, a) => {
       const { metrics } = c;
       const timer = metrics.find({ action: a.name, type: 'timer' });
       const stopTimer = timer.start({ ...m, ...parseLabel(p, m, c) });
       return { stopTimer };
     },
+    /**
+     * @type {import('./types').AfterHook}
+     */
     afterHook: (r, p, m, c, a, { stopTimer }) => {
       stopTimer();
     },
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, m, c, a, { stopTimer }) => {
       stopTimer();
     },

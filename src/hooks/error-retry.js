@@ -17,6 +17,9 @@ import addHooks from './helpers/add-hooks';
  */
 const errorRetry = (options = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: async (e, param, meta, context, action) => {
       const { condition = () => true, maxRetries = 3, delay } = options;
       const { retries = 0 } = meta;

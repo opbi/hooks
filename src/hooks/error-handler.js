@@ -16,6 +16,9 @@ import addHooks from './helpers/add-hooks';
  */
 const errorHandler = ({ condition = () => false, handler = () => {} } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, m, c, a) => {
       if (condition(e, p, m, c, a)) {
         handler(e, p, m, c, a);

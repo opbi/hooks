@@ -14,6 +14,9 @@ import addHooks from './helpers/add-hooks';
  */
 const errorMute = ({ condition = () => true } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, m, c, a) => (condition(e, p, m, c, a) ? e : undefined),
   });
 

@@ -16,13 +16,25 @@ import addHooks from './helpers/add-hooks';
  */
 const eventLogger = ({ logParam, logResult, errorParser = (e) => e } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').BypassHook}
+     */
     bypassHook: (p, m, c) => !c.logger,
+    /**
+     * @type {import('./types').StoreHook}
+     */
     storeHook: (p, meta, c, action) => {
       const { name } = action;
       const event = meta.event ? `${meta.event}.${name}` : name;
       return { event };
     },
+    /**
+     * @type {import('./types').ActionHook}
+     */
     actionHook: (p, meta, c, a, { event }) => a(p, { ...meta, event }, c),
+    /**
+     * @type {import('./types').AfterHook}
+     */
     afterHook: (result, param, meta, { logger }, a, { event }) => {
       const log = {
         ...meta,
@@ -32,6 +44,9 @@ const eventLogger = ({ logParam, logResult, errorParser = (e) => e } = {}) =>
       };
       logger.info(log, event);
     },
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, meta, { logger }, a, { event }) => {
       logger.error({ ...meta, event, error: errorParser(e) }, e.message);
     },

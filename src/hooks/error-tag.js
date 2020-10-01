@@ -21,6 +21,9 @@ const errorTag = ({
   }),
 } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, m, c, a) => {
       const taggedError = tag(e, p, m, c, a);
       throw taggedError;

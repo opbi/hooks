@@ -14,7 +14,15 @@ import addHooks from './helpers/add-hooks';
  */
 const errorCounter = ({ parseLabel = () => {}, value = () => 1 } = {}) =>
   addHooks({
+    /**
+     * bypass the hook if metrics client is not available in the context
+     *
+     * @type {import('./types').BypassHook}
+     */
     bypassHook: (p, m, c) => !c.metrics,
+    /**
+     * @type {import('./types').ErrorHook}
+     */
     errorHook: (e, p, m, c, a) => {
       const counter = c.metrics.find({ action: a.name, type: 'error' });
 

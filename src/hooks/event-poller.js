@@ -20,7 +20,13 @@ const eventPoller = ({
   timeout = 30 * 1000,
 } = {}) =>
   addHooks({
+    /**
+     * @type {import('./types').BypassHook}
+     */
     bypassHook: () => !until,
+    /**
+     * @type {import('./types').StoreHook}
+     */
     storeHook: (p, m, context) => {
       // initial pollingStart time needs to be set before action
       //
@@ -29,6 +35,9 @@ const eventPoller = ({
       const { pollingStart = Date.now(), pollingData = [] } = context;
       return { pollingStart, pollingData };
     },
+    /**
+     * @type {import('./types').AfterHook}
+     */
     afterHook: async (r, p, m, c, action, { pollingData, pollingStart }) => {
       pollingData.push(mapping(r));
 
