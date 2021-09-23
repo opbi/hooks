@@ -7,9 +7,13 @@ SHELL := /bin/bash -v
 ## COMMANDS
 install:
 	@yarn
+	@husky install
+
+upgrade:
+	@yarn upgrade-interactive --latest
 
 cleanup:
-	@rm -rf node_modules coverage dist types docs  *.log
+	@rm -rf node_modules coverage dist types docs  *.log .husky
 
 build:
 	@rm -rf dist

@@ -20,26 +20,28 @@ import moment from 'moment';
 // it is not possible to pass the updated progress before inputFunction call
 // it is not recommended to position this decorator at this location
 
-const jobProgress = (action) => async (param, meta = {}, context = {}) => {
-  const { job, progress } = context;
+const jobProgress =
+  (action) =>
+  async (param, meta = {}, context = {}) => {
+    const { job, progress } = context;
 
-  if (!job || !progress) return action(param, meta, context);
+    if (!job || !progress) return action(param, meta, context);
 
-  // a specific log plugin can be created if multi-level log is needed
-  const { formattedPercentage: percentage } = progress;
-  const timeToFinish = moment.utc(progress.etf).format('HH:mm:ss');
-  const { position } = progress;
+    // a specific log plugin can be created if multi-level log is needed
+    const { formattedPercentage: percentage } = progress;
+    const timeToFinish = moment.utc(progress.etf).format('HH:mm:ss');
+    const { position } = progress;
 
-  const result = await action(
-    param,
-    { ...meta, progress: percentage },
-    context,
-  );
+    const result = await action(
+      param,
+      { ...meta, progress: percentage },
+      context,
+    );
 
-  job.update({ ...job.data, position, timeToFinish });
-  job.progress(percentage);
+    job.update({ ...job.data, position, timeToFinish });
+    job.progress(percentage);
 
-  return result;
-};
+    return result;
+  };
 
 export default jobProgress;

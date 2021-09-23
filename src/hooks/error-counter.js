@@ -7,7 +7,6 @@ import addHooks from './helpers/add-hooks';
  *
  * @template T
  * @typedef {import('./types').ErrorHookMethod<T>} ErrorHookMethod
- *
  * @param {object} options - Decorator config.
  * @param {ErrorHookMethod<object>} [options.parseLabel] - Use to add extra labels to error metrics.
  * @param {ErrorHookMethod<number>} [options.value] - Use to set counter values, e.g. In case that retries are used.

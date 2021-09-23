@@ -7,7 +7,6 @@ import addHooks from './helpers/add-hooks';
  *
  * @template T
  * @typedef {import('./types').ErrorHookMethod<T>} ErrorHookMethod
- *
  * @param {object} options - Config.
  * @param  {ErrorHookMethod<boolean>} [options.condition] - Condition to mute the error.
  * @returns {Error|object|undefined} - If the error is muted(not thrown to upper level) it is accessible in the return value.

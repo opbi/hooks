@@ -8,7 +8,6 @@ import addHooks from './helpers/add-hooks';
  *
  * @template T
  * @typedef {import('./types').ErrorHookMethod<T>} ErrorHookMethod
- *
  * @param {object} options - Config.
  * @param {ErrorHookMethod<object>} [options.tag] - Function to append what to tag to the error.
  */

@@ -9,7 +9,6 @@ import addHooks from './helpers/add-hooks';
  *
  * @template T
  * @typedef {import('./types').ErrorHookMethod<T>} ErrorHookMethod
- *
  * @param {object} options - Config.
  * @param {ErrorHookMethod<boolean>} [options.condition] - Condition to call the handler.
  * @param {ErrorHookMethod<void>} [options.handler] - What to do when the condition met.

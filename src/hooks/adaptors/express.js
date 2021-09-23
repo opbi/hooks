@@ -9,18 +9,21 @@
  * @param  {Function} [options.context] - Config on what variables passed to context, besides the default req, res, next
  * @returns {any} - the original result of the action function
  */
-const adaptorExpress = ({
-  param = (req) => req.body,
-  meta = (req) => req.meta,
-  context = () => {},
-} = {}) => (action) => async (req, res, next) => {
-  const p = param(req, res, next);
-  const m = meta(req, res, next);
-  const c = context(req, res, next);
+const adaptorExpress =
+  ({
+    param = (req) => req.body,
+    meta = (req) => req.meta,
+    context = () => {},
+  } = {}) =>
+  (action) =>
+  async (req, res, next) => {
+    const p = param(req, res, next);
+    const m = meta(req, res, next);
+    const c = context(req, res, next);
 
-  const result = await action(p, m, { ...c, req, res, next });
+    const result = await action(p, m, { ...c, req, res, next });
 
-  return result;
-};
+    return result;
+  };
 
 export default adaptorExpress;
