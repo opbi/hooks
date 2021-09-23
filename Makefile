@@ -12,6 +12,9 @@ install:
 upgrade:
 	@yarn upgrade-interactive --latest
 
+nvm-update:
+	@bash -l -c 'nvm install --latest-npm --reinstall-packages-from=$(shell node -v)'
+
 cleanup:
 	@rm -rf node_modules coverage dist types docs  *.log .husky
 
