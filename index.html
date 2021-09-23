@@ -1425,7 +1425,7 @@ this decorator attaches action name to the error then being thrown to a logged l
                 <tr>
   <td class='break-word'><span class='code bold'>options.tag</span> <code class='quiet'>ErrorHookMethod&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>>?</code>
   
-    (default <code>(e,p,m,c,a)=&gt;{action:a.name,message:e.message,constructor:e.constructor.name,stack:e.stack.split(&#39;\n&#39;).map(s=&gt;s.trim())}</code>)
+    (default <code>(e,p,m,c,a)=&gt;({action:a.name,message:e.message,constructor:e.constructor.name,stack:e.stack.split(&#39;\n&#39;).map(s=&gt;s.trim())})</code>)
   </td>
   <td class='break-word'><span>Function to append what to tag to the error.
 </span></td>
@@ -3255,7 +3255,7 @@ and send metrics using the client attached in context.</p>
   
     (default <code>()=&gt;{}</code>)
   </td>
-  <td class='break-word'><span> Define a function to prepare values to be accessed by other hooks.
+  <td class='break-word'><span>Define a function to prepare values to be accessed by other hooks.
 </span></td>
 </tr>
 
