@@ -52,22 +52,24 @@
 By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services, codebases or teams.
 
 ```js
-/* handler.js */
-import logger, metrics from '@opbi/toolchain';
-import { eventLogger, eventTimer } from '@opbi/hooks';
+/* decorator.js - configure and assemble your decorators */
+import { chain, eventLogger, eventTimer } from '@opbi/hooks';
 
-const withObserver = chain(eventLogger, eventTimer);
-const getSubscription = withObserver(userProfileApi.getSubscription);
-const cancelSubscription = withObserver(subscriptionApi.cancel)
+export const monitor = chain(eventLogger, eventTimer);
+
+/* handler.js - attach the decorator to the step you want to monitor */
+import { monitor } from './decorator.js';
+import { userProfileApi, subscriptionApi } from './api.js';
 
 const handleUserCancelSubscription = async ({ userId }, meta, context) => {
-  const { subscriptionId } = await getSubscription( { userId }, meta, context );
-  await cancelSubscription({ subscriptionId }, meta, context);
+  const { subscriptionId } = await monitor(userProfileApi.getSubscription)( { userId }, meta, context );
+  await monitor(subscriptionApi.cancel)({ subscriptionId }, meta, context);
 };
 
-export default withObserver(handleUserCancelSubscription);
+export default monitor(handleUserCancelSubscription);
 
-/* router.js */
+/* router.js - pass the log, metrics instance from the top */
+import logger, metrics from '@opbi/toolchain';
 import handleUserCancelSubscription from './handler.js';
 
 await handleUserCancelSubscription({ userId }, meta, { logger, metrics });
