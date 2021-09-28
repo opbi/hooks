@@ -43,6 +43,26 @@
 
 ---
 
+- [Purpose](#purpose)
+  * [Easy Consistency as Toolings](#easy-consistency-as-toolings)
+  * [Business Logic in Self-Expanatory Code](#business-logic-in-self-expanatory-code)
+- [How to Use](#how-to-use)
+  * [Install](#install)
+  * [Config the Hooks](#config-the-hooks)
+  * [Chain the Hooks](#chain-the-hooks)
+  * [Ecosystem](#ecosystem)
+  * [Extension](#extension)
+  * [Opinionated Function Signature](#opinionated-function-signature)
+  * [Refactor](#refactor)
+  * [Without Decorator and Pipe Operators](#without-decorator-and-pipe-operators)
+- [Integration](#integration)
+  * [Integrate with Server Frameworks](#integrate-with-server-frameworks)
+  * [Integrate with Redux](#integrate-with-redux)
+- [Inspiration](#inspiration)
+- [License](#license)
+
+---
+
 ### Purpose
 
 #### Easy Consistency as Toolings
@@ -167,9 +187,6 @@ function (param, meta, context) {}
 #### Refactor
 To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
 
----
-### Integration
-
 #### Without Decorator and Pipe Operators
 
 > We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
@@ -190,6 +207,9 @@ export const userCancelSubscription = async pipeHookEach(
   )(SubscriptionAPI.cancel),
 );
 ```
+
+---
+### Integration
 
 #### Integrate with Server Frameworks
 
