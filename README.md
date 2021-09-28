@@ -3,7 +3,7 @@
 </p>
 
 <h3 align="center">hooks</h3>
-<p align="center" style="margin-bottom: 2em;"></p>
+<p align="center" style="margin-bottom: 2em;">opinionated decorator suite for easy cross-service consistency and self-explanatory codebase</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@opbi/hooks">
@@ -173,6 +173,7 @@ Currently available hooks:
 You can easily create more standardised hooks with [addHooks](https://github.com/opbi/hooks/blob/master/src/hooks/helpers/add-hooks.js) helper. Open source them aligning with the above standards via pull requests or individual packages are highly encouraged.
 
 ---
+### Integration
 
 #### Without Decorator and Pipe Operators
 
