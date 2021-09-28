@@ -47,40 +47,49 @@
 
 #### Consistency as Toolings (CasT)
 
-> what to observability and control patterns, like linters to code styles
+By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services and teams.
 
-By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services, codebases or teams.
+> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
 
 ```js
-/* decorator.js - configure and assemble your decorators */
-import { chain, eventLogger, eventTimer } from '@opbi/hooks';
-
-export const monitor = chain(eventLogger, eventTimer);
-
-/* handler.js - attach the decorator to the step you want to monitor */
-import { monitor } from './decorator.js';
+/* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
+import { hookEachPipe, eventLogger, eventTimer } from '@opbi/hooks';
 import { userProfileApi, subscriptionApi } from './api.js';
 
-const handleUserCancelSubscription = async ({ userId }, meta, context) => {
-  const { subscriptionId } = await monitor(userProfileApi.getSubscription)( { userId }, meta, context );
-  await monitor(subscriptionApi.cancel)({ subscriptionId }, meta, context);
-};
-
-export default monitor(handleUserCancelSubscription);
-
-/* router.js - pass the log, metrics instance from the top */
-import logger, metrics from '@opbi/toolchain';
-import handleUserCancelSubscription from './handler.js';
-
-await handleUserCancelSubscription({ userId }, meta, { logger, metrics });
+export const handleUserCancelSubscription = async hookEachPipe(
+  // all with default configuration applied to each step below
+  eventLogger(), eventTimer() 
+)(
+  userProfileAPI.getSubscription, 
+  errorRetry()(subscriptionAPI.cancel), // precise control with step only hook
+);
 ```
-Hooks can automate standardised log, metrics and tracing in a structure reflecting the call stacks. This greatly improves observability coverage and makes monitor and debugging a breeze with good precision locating problematic function.
+
+With the a few lines of hooks configuration above, we have error handling, standardised log and metrics throughout the call stacks with info to pinpoint precisely where the error happened and how to reproduce the it. This is easily directing us to look into the `subscriptionAPI.cancel`, which can be integrated with automated alerting and debugging system as well.
 
 ```shell
 [info] event: handleUserCancelSubscription
 [info] event: handleUserCancelSubscription.getSubscription
-[error] event: handleUserCancelSubscription.cancelSubscription, type: TimeoutError
+[error] event: handleUserCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { userId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
+
+Those hooked functions can be seemlessly plugged into server frameworks with the adaptor provided, e.g. Express.
+
+```js
+/* app.js - setup logger, metrics and adapt the express router to use hook signature */
+import express from 'express';
+import logger, metrics from '@opbi/toolchain';
+import { adaptorExpress } from '@opbi/hooks';
+
+export default adaptorExpress(express, { logger, metrics });
+
+/* router.js - use the handler with automated logger, metrics */
+import app from './app.js';
+import { handleUserCancelSubscription } from './handler.js';
+
+app.delete('/subscription/:userId', handleUserCancelSubscription);
+```
+
 
 #### Readability, Reusability, Testability (RRT)
 
