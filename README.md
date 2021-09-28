@@ -47,9 +47,9 @@
 
 #### Easy Consistency as Toolings
 
-By packing all standardisable patterns such as observarability, error handling, etc. as reusable decorators, it promotes and ensures consistency across micro-services and teams. This greatly improves the monitor efficiency and debugging experience. 
+By packing all standardisable patterns such as observarability, error handling, etc. as reusable decorators, it promotes and ensures consistency across micro-services and teams. This greatly improves the monitor efficiency and debugging or maintainance experience.
 
-It is a very simple package and many companies probably have similar ones built in-house, while this package aims at providing the most maintainable, concise and universal solution to the common problem.
+It is a very simple package and many companies probably have similar ones built in-house, while this package aims at providing the most maintainable, concise and universal solution to the common problem, utilising everything modern JavaScript is offering.
 
 
 ```js
@@ -68,12 +68,12 @@ class SubscriptionAPI
   @errorRetry({ condition: e => e.type === 'TimeoutError' })
   cancel({ SubscriptionId }):
     //...
-
+```
+```js
 /* handler.js - an illustration of the business logic */
 import { UserProfileAPI, SubscriptionAPI } from './api.js';
 
 /**
-  user cancel subscription
   @param {string} param.userId
 **/
 export const userCancelSubscription = ({ userId }, meta, context)
@@ -82,15 +82,17 @@ export const userCancelSubscription = ({ userId }, meta, context)
   
 ```
 
-> With the decorator and pipe operators being enabled, we can easily turn the codebase into an illustration of business logic and technical behaviour. They also work greatly [without the operators](#without-decorator-and-pipe-operators). Those decorators work out of box with minimum configuration with the [opionated function signature]( 
+> Those decorators work out of box with minimum configuration thanks to the [opionated function signature]( 
 #opinionated-function-signature).
 
-The structured log it produced below obviously helps to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into automated cross-team alerting and debugging system.
+The structured log it produced below makes it a breeze to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into an automated cross-team monitoring and alerting system.
 
 ```shell
 [info] event: userCancelSubscription.getSubscription
 [error] event: userCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { subscriptionId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
+
+> With the decorator and pipe operators being enabled, we can easily turn the codebase into an illustration of business logic and technical behaviour. They also work greatly [without the operators](#without-decorator-and-pipe-operators).
 
 
 #### Business Logic in Self-Expanatory Code
@@ -109,19 +111,19 @@ yarn add @opbi/hooks
 
 #### Config the Hooks
 
-All the hooks in @opbi/hooks come with a default configuration.
+All the hooks come with default configuration.
 
 ```js
 errorRetry()(stepFunction)
 ```
 
-Descriptive names of hook configurations help to make the behaviour more self-explanatory.
+Descriptive names of configured hooks help to make the behaviour self-explanatory.
 
 ```js
 const errorRetryOnTimeout = errorRetry({ condition: e => e.type === 'TimeoutError' })
 ```
 
-Patterns composed of configured hooks can certainly be reused.
+Patterns composed of configured hooks can easily be reused.
 
 ```js
 const monitor = chain(eventLogger(), eventTimer(), eventTracer());
@@ -134,6 +136,18 @@ const monitor = chain(eventLogger(), eventTimer(), eventTracer());
 <a href="https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions/">
   <img alt="decorators" width="640" src="https://innolitics.com/img/javascript-decorators.png"/>
 </a>
+
+#### Ecosystem
+
+Check the [automated doc page](https://opbi.github.io/hooks/) for the available hooks in the current ecosystem.
+
+> Hooks are named in a convention to reveal where and how it works `[hook point][what it is/does]`, e.g. *errorCounter, eventLogger*. Hook points are named `before, after, error` and `event` (multiple points).
+
+#### Extension
+
+You can easily create more standardised hooks with [addHooks](https://github.com/opbi/hooks/blob/master/src/hooks/helpers/add-hooks.js) helper. Open source them aligning with the above standards via pull requests or individual packages are highly encouraged.
+
+---
 
 #### Opinionated Function Signature
 
@@ -153,16 +167,6 @@ function (param, meta, context) {}
 #### Refactor
 To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
 
-#### Ecosystem
-
-Check the [automated doc page](https://opbi.github.io/hooks/) for the available hooks in the current ecosystem.
-
-> Hooks are named in a convention to reveal where and how it works `[hook point][what it is/does]`, e.g. *errorCounter, eventLogger*. Hook points are named `before, after, error` and `event` (multiple points).
-
-#### Extension
-
-You can easily create more standardised hooks with [addHooks](https://github.com/opbi/hooks/blob/master/src/hooks/helpers/add-hooks.js) helper. Open source them aligning with the above standards via pull requests or individual packages are highly encouraged.
-
 ---
 ### Integration
 
@@ -172,10 +176,10 @@ You can easily create more standardised hooks with [addHooks](https://github.com
 
 ```js
 /* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
-import { hookEachPipe, eventLogger, eventTimer } from '@opbi/hooks';
+import { pipeHookEach, eventLogger, eventTimer } from '@opbi/hooks';
 import { UserProfileAPI, SubscriptionAPI } from './api.js';
 
-export const userCancelSubscription = async hookEachPipe(
+export const userCancelSubscription = async pipeHookEach(
   // all with default configuration applied to each step below
   eventLogger(), eventTimer() 
 )(
@@ -201,9 +205,9 @@ export default adaptorExpress(express, { logger, metrics });
 
 /* router.js - use the handler with automated logger, metrics */
 import app from './app.js';
-import { handleUserCancelSubscription } from './handler.js';
+import { userCancelSubscription } from './handler.js';
 
-app.delete('/subscription/:userId', handleUserCancelSubscription);
+app.delete('/subscription/:userId', userCancelSubscription);
 ```
 
 #### Integrate with Redux
