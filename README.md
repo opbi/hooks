@@ -45,133 +45,59 @@
 
 ### Purpose
 
-#### Consistency as Toolings (CasT)
+#### Easy Consistency as Toolings
 
-By standardise common error handling, observability logic or other patterns as reusable modules, it ensures consistency of observability standards across micro-services and teams.
+By packing all standardisable patterns such as observarability, error handling, etc. as reusable decorators, it promotes and ensures consistency across micro-services and teams. This greatly improves the monitor efficiency and debugging experience. 
 
-> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
+It is a very simple package and many companies probably have similar ones built in-house, while this package aims at providing the most maintainable, concise and universal solution to the common problem.
+
 
 ```js
-/* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
-import { hookEachPipe, eventLogger, eventTimer } from '@opbi/hooks';
-import { userProfileApi, subscriptionApi } from './api.js';
+/* api.js - common behaviour can be declared by decorators */
+class UserProfileAPI
+  //...
+  @eventLogger()
+  @eventTimer()
+  getSubscription({ userId }):
+    //...
 
-export const handleUserCancelSubscription = async hookEachPipe(
-  // all with default configuration applied to each step below
-  eventLogger(), eventTimer() 
-)(
-  userProfileAPI.getSubscription, 
-  errorRetry()(subscriptionAPI.cancel), // precise control with step only hook
-);
+class SubscriptionAPI
+  //...
+  @eventLogger()
+  @eventTimer()
+  @errorRetry({ condition: e => e.type === 'TimeoutError' })
+  cancel({ SubscriptionId }):
+    //...
+
+/* handler.js - an illustration of the business logic */
+import { UserProfileAPI, SubscriptionAPI } from './api.js';
+
+/**
+  user cancel subscription
+  @param {string} param.userId
+**/
+export const userCancelSubscription = ({ userId }, meta, context)
+  |> UserProfileAPI.getSubscription
+  |> SubscriptionAPI.cancel
+  
 ```
 
-With the a few lines of hooks configuration above, we have error handling, standardised log and metrics throughout the call stacks with info to pinpoint precisely where the error happened and how to reproduce the it. This is easily directing us to look into the `subscriptionAPI.cancel`, which can be integrated with automated alerting and debugging system as well.
+> With the decorator and pipe operators being enabled, we can easily turn the codebase into an illustration of business logic and technical behaviour. They also work greatly [without the operators](#without-decorator-and-pipe-operators). Those decorators work out of box with minimum configuration with the [opionated function signature]( 
+#opinionated-function-signature).
+
+The structured log it produced below obviously helps to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into automated cross-team alerting and debugging system.
 
 ```shell
-[info] event: handleUserCancelSubscription
-[info] event: handleUserCancelSubscription.getSubscription
-[error] event: handleUserCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { userId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
-```
-
-Those hooked functions can be seemlessly plugged into server frameworks with the adaptor provided, e.g. Express.
-
-```js
-/* app.js - setup logger, metrics and adapt the express router to use hook signature */
-import express from 'express';
-import logger, metrics from '@opbi/toolchain';
-import { adaptorExpress } from '@opbi/hooks';
-
-export default adaptorExpress(express, { logger, metrics });
-
-/* router.js - use the handler with automated logger, metrics */
-import app from './app.js';
-import { handleUserCancelSubscription } from './handler.js';
-
-app.delete('/subscription/:userId', handleUserCancelSubscription);
+[info] event: userCancelSubscription.getSubscription
+[error] event: userCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { subscriptionId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
 
 
-#### Readability, Reusability, Testability (RRT)
+#### Business Logic in Self-Expanatory Code
 
-Turn scattered repeatitive control mechanism or observability code from interwined blocks to more readable, reusable, testable ones.
+By abstract out all common control mechanism and observability code into well-tested, composable decorators, this also helps to achieve codebase that is self-explanatory of its business logic and technical behaviour by the names of functions and decorators. This is great for testing and potentially rewrite the entire business logic functions as anything other than business logic is being packed into well-tested reusable decorators, which can be handily mocked during test.
 
-By abstract out common control mechanism and observability code into well-tested, composable hooks, it can effectively half the verboseness of your code. This helps to achieve codebase that is self-explanatory of its business logic and technical behaviour. Additionally, conditionally turning certain mechanism off makes testing the code very handy.
 
-Let's measure the effect in LOC (Line of Code) and LOI (Level of Indent) by an example of cancelling user subscription on server-side with some minimal error handling of retry and restore. The simplification effect will be magnified with increasing complexity of the control mechanism.
-
-> Using @opbi/hooks Hooks: LOC = 16, LOI = 2
-```js
-// import userProfileApi from './api/user-profile';
-// import subscriptionApi from './api/subscription';
-// import restoreSubscription from './restore-subscription'
-
-import { errorRetry, errorHandler, chain } from '@opbi/hooks';
-
-const retryOnTimeoutError = errorRetry({
-  condition: e => e.type === 'TimeoutError'
-});
-
-const restoreOnServerError = errorHandler({
-  condition: e => e.code > 500,
-  handler: (e, p, m, c) => restoreSubscription(p, m, c),
-});
-
-const cancelSubscription = async ({ userId }, meta, context) => {
-  const { subscriptionId } = await chain(
-    retryOnTimeoutError
-  )(userProfileApi.getSubscription)( { userId }, meta, context );
-
-  await chain(
-    errorRetry(), restoreOnServerError,
-  )(subscriptionApi.cancel)({ subscriptionId }, meta, context);
-};
-
-// export default cancelSubscription;
-```
-
-> Vanilla JavaScript: LOC = 32, LOI = 4
-```js
-// import userProfileApi from './api/user-profile';
-// import subscriptionApi from './api/subscription';
-// import restoreSubscription from './restore-subscription'
-
-const cancelSubscription = async ({ userId }, meta, context) => {
-  let subscriptionId;
-
-  try {
-    const result = await userProfileApi.getSubscription({ userId }, meta, context);
-    subscriptionId = result.subscriptionId;
-  } catch (e) {
-    if(e.type === 'TimeoutError'){
-      const result = await userProfileApi.getSubscription({ userId }, meta, context);
-      subscriptionId = result.subscriptionId;
-    }
-    throw e;
-  }
-
-  try {
-    try {
-      await subscriptionApi.cancel({ subscriptionId }, meta, context);
-    } catch (e) {
-      if(e.code > 500) {
-        await restoreSubscription({ subscriptionId }, meta, context);
-      }
-      throw e;
-    }
-  } catch (e) {
-    try {
-      return await subscriptionApi.cancel({ subscriptionId }, meta, context);
-    } catch (e) {
-      if(e.code > 500) {
-        await restoreSubscription({ subscriptionId }, meta, context);
-      }
-      throw e;
-    }
-  }
-};
-
-// export default cancelSubscription;
-```
 
 ---
 ### How to Use
@@ -181,7 +107,35 @@ const cancelSubscription = async ({ userId }, meta, context) => {
 yarn add @opbi/hooks
 ```
 
-#### Standard Function
+#### Config the Hooks
+
+All the hooks in @opbi/hooks come with a default configuration.
+
+```js
+errorRetry()(stepFunction)
+```
+
+Descriptive names of hook configurations help to make the behaviour more self-explanatory.
+
+```js
+const errorRetryOnTimeout = errorRetry({ condition: e => e.type === 'TimeoutError' })
+```
+
+Patterns composed of configured hooks can certainly be reused.
+
+```js
+const monitor = chain(eventLogger(), eventTimer(), eventTracer());
+```
+
+#### Chain the Hooks
+
+> "The order of the hooks in the chain matters."
+
+<a href="https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions/">
+  <img alt="decorators" width="640" src="https://innolitics.com/img/javascript-decorators.png"/>
+</a>
+
+#### Opinionated Function Signature
 
 Standardisation of function signature is powerful that it creates predictable value flows throughout the functions and hooks chain, making functions more friendly to meta-programming. Moreover, it is also now a best-practice to use object destruct assign for key named parameters.
 
@@ -196,30 +150,9 @@ Via exploration and the development of hooks, we set a function signature standa
 function (param, meta, context) {}
 ```
 
-#### Config the Hooks
+#### Refactor
+To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
 
-All the hooks in @opbi/hooks are configurable with possible default settings.
-
-In the [cancelSubscription](##readability-reusability-testability-rrt) example, *errorRetry()* is using its default settings, while *restoreOnServerError* is configured *errorHandler*. Descriptive names of hook configurations help to make the behaviour very self-explanatory. Patterns composed of configured hooks can certainly be reused.
-
-```js
-const restoreOnServerError = errorHandler({
-  condition: e => e.code > 500,
-  handler: (e, p, m, c) => restoreSubscription(p, m, c),
-});
-```
-
-#### Chain the Hooks
-
-> "The order of the hooks in the chain matters."
-
-<a href="https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions/">
-  <img alt="decorators" width="640" src="https://innolitics.com/img/javascript-decorators.png"/>
-</a>
-
-Under the hood, the hooks are implemented in the [decorators](https://innolitics.com/articles/javascript-decorators-for-promise-returning-functions) pattern. The pre-hooks, action function, after-hooks/error-hooks are invoked in a pattern as illustrated above. In the [cancelSubscription](##readability-reusability-testability-rrt) example, as *errorRetry(), restoreOnServerError* are all error hooks, *restoreOnServerError* will be invoked first before *errorRetry* is invoked.
-
----
 #### Ecosystem
 
 Currently available hooks:
@@ -240,45 +173,50 @@ Currently available hooks:
 You can easily create more standardised hooks with [addHooks](https://github.com/opbi/hooks/blob/master/src/hooks/helpers/add-hooks.js) helper. Open source them aligning with the above standards via pull requests or individual packages are highly encouraged.
 
 ---
-#### Decorators
-Hooks here are essentially configurable decorators, while different in the way of usage. We found the name 'hooks' better describe the motion that they are attached to functions not modifying their original data process flow (keep it pure). Decorators are coupled with class methods, while hooks help to decouple definition and control, attaching to any function on demand.
+
+#### Without Decorator and Pipe Operators
+
+> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
 
 ```js
-//decorators
-class SubscriptionAPI:
-  //...
-  @errorRetry()
-  cancel: () => {}
-```
-```js
-//hooks
+/* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
+import { hookEachPipe, eventLogger, eventTimer } from '@opbi/hooks';
+import { UserProfileAPI, SubscriptionAPI } from './api.js';
+
+export const userCancelSubscription = async hookEachPipe(
+  // all with default configuration applied to each step below
+  eventLogger(), eventTimer() 
+)(
+  UserProfileAPI.getSubscription, 
+  // precise control with step only hook
   chain(
-    errorRetry()
-  )(subscriptionApi.cancel)
+    errorRetry({ condition: e => e.type === 'TimeoutError' })
+  )(SubscriptionAPI.cancel),
+);
 ```
-#### Adaptors
-To make plugging in @opbi/hooks hooks to existing systems easier, adaptors are introduced to bridge different function signature standards.
+
+#### Integrate with Server Frameworks
+
+Those hook enhanced functions can be seemlessly plugged into server frameworks with the adaptor provided, e.g. Express.
+
 ```js
-const handler = chain(
-  adaptorExpress(),
-  errorRetry()
-)(subscriptionApi.cancel)
+/* app.js - setup logger, metrics and adapt the express router to use hook signature */
+import express from 'express';
+import logger, metrics from '@opbi/toolchain';
+import { adaptorExpress } from '@opbi/hooks';
 
-handler(req, res, next);
+export default adaptorExpress(express, { logger, metrics });
+
+/* router.js - use the handler with automated logger, metrics */
+import app from './app.js';
+import { handleUserCancelSubscription } from './handler.js';
+
+app.delete('/subscription/:userId', handleUserCancelSubscription);
 ```
-#### Refactor
-To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
 
-#### Reducers
+#### Integrate with Redux
 Integration with Redux is TBC.
 
-#### Pipe Operator
-We are excited to see how pipe operator will be rolled out and hooks can be elegantly plugged in.
-```js
-const cancelSubscription = ({ userId }, meta, context)
-  |> chain(timeoutErrorRetry)(userProfileApi.getSubscription)
-  |> chain(restoreOnServerError, timeoutErrorRetry)(subscriptionApi.cancel);
-```
 ---
 ### Inspiration
 * [Financial-Times/n-express-monitor](https://github.com/Financial-Times/n-express-monitor)
