@@ -155,16 +155,7 @@ To help adopting the hooks by testing them out with minimal refactor on non-stan
 
 #### Ecosystem
 
-Currently available hooks:
-
-* [errorCounter](https://github.com/opbi/hooks/blob/master/src/hooks/error-counter.js)
-* [errorHandler](https://github.com/opbi/hooks/blob/master/src/hooks/error-handler.js)
-* [errorMute](https://github.com/opbi/hooks/blob/master/src/hooks/error-mute.js)
-* [errorRetry](https://github.com/opbi/hooks/blob/master/src/hooks/error-retry.js)
-* [errorTag](https://github.com/opbi/hooks/blob/master/src/hooks/error-tag.js)
-* [eventLogger](https://github.com/opbi/hooks/blob/master/src/hooks/event-logger.js)
-* [eventPoller](https://github.com/opbi/hooks/blob/master/src/hooks/event-poller.js)
-* [eventTimer](https://github.com/opbi/hooks/blob/master/src/hooks/event-timer.js)
+Check the [automated doc page](https://opbi.github.io/hooks/) for the available hooks in the current ecosystem.
 
 > Hooks are named in a convention to reveal where and how it works `[hook point][what it is/does]`, e.g. *errorCounter, eventLogger*. Hook points are named `before, after, error` and `event` (multiple points).
 
