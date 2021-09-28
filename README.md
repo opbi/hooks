@@ -3,7 +3,7 @@
 </p>
 
 <h3 align="center">hooks</h3>
-<p align="center" style="margin-bottom: 2em;">opinionated decorator suite for easy cross-service consistency and self-explanatory codebase</p>
+<p align="center" style="margin-bottom: 2em;">opinionated decorator suite for easy cross-project observability consistency and self-explanatory codebase</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@opbi/hooks">
