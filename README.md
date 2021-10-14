@@ -46,6 +46,7 @@
 - [Purpose](#purpose)
   * [Easy Consistency as Toolings](#easy-consistency-as-toolings)
   * [Business Logic in Self-Expanatory Code](#business-logic-in-self-expanatory-code)
+  * [JavaScript Decorators At Its Best](#javascript-decorators-at-its-best)
 - [How to Use](#how-to-use)
   * [Install](#install)
   * [Config the Hooks](#config-the-hooks)
@@ -103,7 +104,7 @@ export const userCancelSubscription = ({ userId }, meta, context)
 ```
 
 > Those decorators work out of box with minimum configuration thanks to the [opionated function signature]( 
-#opinionated-function-signature).
+#opinionated-function-signature). They also work nicely [without @, |> operators](#without-decorator-and-pipe-operators).
 
 The structured log it produced below makes it a breeze to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into an automated cross-team monitoring and alerting system.
 
@@ -112,14 +113,16 @@ The structured log it produced below makes it a breeze to precisely pinpoint the
 [error] event: userCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { subscriptionId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
 
-> With the decorator and pipe operators being enabled, we can easily turn the codebase into an illustration of business logic and technical behaviour. They also work greatly [without the operators](#without-decorator-and-pipe-operators).
+> With the decorator and pipe operators being enabled, we can easily turn the codebase into an illustration of business logic and technical behaviour.
 
 
 #### Business Logic in Self-Expanatory Code
 
 By abstract out all common control mechanism and observability code into well-tested, composable decorators, this also helps to achieve codebase that is self-explanatory of its business logic and technical behaviour by the names of functions and decorators. This is great for testing and potentially rewrite the entire business logic functions as anything other than business logic is being packed into well-tested reusable decorators, which can be handily mocked during test.
 
+#### JavaScript Decorators At Its Best
 
+It is not hard to build another decorator suite, but it takes great care to build a suite utilising all features and avoid all pitfalls of JavaScript. For example, standard decorators need to be enhaced so that decoratee function names can be passed correctly along the decorator chain. This is well taken care of using the [provided helper](#extension). This high-quality suite draws the essence from its predecessor that has served a large-scale production system and is designed to empower your codebase with minimum effort.
 
 ---
 ### How to Use
