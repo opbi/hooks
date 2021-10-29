@@ -3,7 +3,7 @@
 </p>
 
 <h3 align="center">hooks</h3>
-<p align="center" style="margin-bottom: 2em;">opinionated decorator suite for easy cross-project observability consistency and self-explanatory codebase</p>
+<p align="center" style="margin-bottom: 2em;">configurable decorators for automated observability and self-explanatory codebase</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@opbi/hooks">
@@ -76,25 +76,30 @@ class UserProfileAPI
   //...
   @eventLogger()
   @eventTimer()
-  getSubscription({ userId }):
+  getSubscription({ userId }) {
     //...
+  }
 
 class SubscriptionAPI
   //...
   @eventLogger()
   @eventTimer()
   @errorRetry({ condition: e => e.type === 'TimeoutError' })
-  cancel({ SubscriptionId }):
+  cancel({ subscriptionId }) {
     //...
+  }
 ```
 ```js
 /* handler.js - an illustration of the business logic */
 import { UserProfileAPI, SubscriptionAPI } from './api.js';
 
-export const userCancelSubscription = ({ userId }, meta, context)
-  |> UserProfileAPI.getSubscription
-  |> SubscriptionAPI.cancel
-  
+class Handler
+  //...
+  @eventLogger()
+  @eventTimer()
+  userCancelSubscription = ({ userId }, meta, context)
+    |> UserProfileAPI.getSubscription
+    |> SubscriptionAPI.cancel
 ```
 > Thanks to the [opionated function signature](#opinionated-function-signature), those decorators work out of box with minimum configuration to create a calling stack tree using the exact names of the decorated functions, producing structured log, metrics, tracing.
 
@@ -105,23 +110,25 @@ The structured log it produced below makes it a breeze to precisely pinpoint the
 [error] event: userCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { subscriptionId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
 
-> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
+We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
 
 ```js
 /* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
-import { pipeHookEach, eventLogger, eventTimer } from '@opbi/hooks';
+import { chain, eventLogger, eventTimer, errorRetry } from '@opbi/hooks';
 import { UserProfileAPI, SubscriptionAPI } from './api.js';
 
-export const userCancelSubscription = async pipeHookEach(
-  // all with default configuration applied to each step below
-  eventLogger(), eventTimer() 
-)(
-  UserProfileAPI.getSubscription, 
-  // precise control with step only hook
-  chain(
-    errorRetry({ condition: e => e.type === 'TimeoutError' })
-  )(SubscriptionAPI.cancel),
-);
+const monitor = chain(eventLogger(), eventTimer());
+
+const userCancelSubscription = ({ userId }, meta, context)
+  |> monitor(UserProfileAPI.getSubscription)
+  |> chain(
+    monitor, 
+    errorRetry({ condition: e => e.type === 'TimeoutError' }), // step level control
+  )(SubscriptionAPI.cancel)
+
+export default {
+  'userCancelSubscription': monitor(userCancelSubscription)
+};
 ```
 
 #### Self-Expanatory Business Logic
@@ -219,9 +226,9 @@ export default adaptorExpress(express, { logger, metrics });
 
 /* router.js - use the handler with automated logger, metrics */
 import app from './app.js';
-import { userCancelSubscription } from './handler.js';
+import Handler from './handler.js';
 
-app.delete('/subscription/:userId', userCancelSubscription);
+app.delete('/subscription/:userId', Handler.userCancelSubscription);
 ```
 
 #### Integrate with Redux
