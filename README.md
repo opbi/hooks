@@ -44,8 +44,8 @@
 ---
 
 - [Purpose](#purpose)
-  * [Easy Consistency as Toolings](#easy-consistency-as-toolings)
-  * [Business Logic as Self-Expanatory Code](#business-logic-as-self-expanatory-code)
+  * [Automated Observability and Error Handling](#automated-observability-and-error-handling)
+  * [Self-Expanatory Business Logic](#self-expanatory-business-logic)
   * [JavaScript Decorators At Its Best](#javascript-decorators-at-its-best)
 - [How to Use](#how-to-use)
   * [Install](#install)
@@ -55,7 +55,6 @@
   * [Extension](#extension)
   * [Opinionated Function Signature](#opinionated-function-signature)
   * [Refactor](#refactor)
-  * [Without Decorator and Pipe Operators](#without-decorator-and-pipe-operators)
 - [Integration](#integration)
   * [Integrate with Server Frameworks](#integrate-with-server-frameworks)
   * [Integrate with Redux](#integrate-with-redux)
@@ -66,9 +65,9 @@
 
 ### Purpose
 
-#### Easy Consistency as Toolings
+#### Automated Observability and Error Handling
 
-By packing all standardisable patterns such as observarability, error handling, etc. as reusable decorators, it promotes and ensures consistency across micro-services and teams. This greatly improves the monitor efficiency and debugging or maintainance experience.
+By packing all standardisable patterns such as observarability, error handling, etc. as reusable decorators, it promotes and ensures consistency across micro-services and teams. This greatly improves the monitor clarity and debugging/maintainance experience.
 
 
 ```js
@@ -92,26 +91,40 @@ class SubscriptionAPI
 /* handler.js - an illustration of the business logic */
 import { UserProfileAPI, SubscriptionAPI } from './api.js';
 
-/**
-  @param {string} param.userId
-**/
 export const userCancelSubscription = ({ userId }, meta, context)
   |> UserProfileAPI.getSubscription
   |> SubscriptionAPI.cancel
   
 ```
+> Thanks to the [opionated function signature](#opinionated-function-signature), those decorators work out of box with minimum configuration to create a calling stack tree using the exact names of the decorated functions, producing structured log, metrics, tracing.
 
-The structured log it produced below makes it a breeze to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into an automated cross-team monitoring and alerting system.
+The structured log it produced below makes it a breeze to precisely pinpoint the error function with param to reproduce the case. This can be easily further integrated into an automated cross-team monitoring and alerting/debugging system.
 
 ```shell
 [info] event: userCancelSubscription.getSubscription
 [error] event: userCancelSubscription.cancelSubscription, type: TimeoutError, Retry: 1, Param: { subscriptionId: '4672c33a-ff0a-4a8c-8632-80aea3a1c1c1' }
 ```
 
-> Those decorators work out of box with minimum configuration thanks to the [opionated function signature]( 
-#opinionated-function-signature). They also work nicely [without @, |> operators](#without-decorator-and-pipe-operators).
+> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
 
-#### Business Logic as Self-Expanatory Code
+```js
+/* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
+import { pipeHookEach, eventLogger, eventTimer } from '@opbi/hooks';
+import { UserProfileAPI, SubscriptionAPI } from './api.js';
+
+export const userCancelSubscription = async pipeHookEach(
+  // all with default configuration applied to each step below
+  eventLogger(), eventTimer() 
+)(
+  UserProfileAPI.getSubscription, 
+  // precise control with step only hook
+  chain(
+    errorRetry({ condition: e => e.type === 'TimeoutError' })
+  )(SubscriptionAPI.cancel),
+);
+```
+
+#### Self-Expanatory Business Logic
 
 By abstract out all common control mechanism and observability code into well-tested, composable decorators, this also helps to achieve codebase that is self-explanatory of its business logic and technical behaviour by the names of functions and decorators. This is great for testing and potentially rewrite the entire business logic functions as anything other than business logic is being packed into well-tested reusable decorators, which can be handily mocked during test.
 
@@ -188,27 +201,6 @@ function (param, meta, context) {}
 
 #### Refactor
 To help adopting the hooks by testing them out with minimal refactor on non-standard signature functions, there's an unreleased [adaptor](https://github.com/opbi/toolchain/blob/adapator-non-standard/src/hooks/adaptors/nonstandard.js) to bridge the function signatures. It is not recommended to use this for anything but trying the hooks out, especially observability hooks are not utilised this way.
-
-#### Without Decorator and Pipe Operators
-
-> We are calling those decorators **hooks(decorators at call-time beside definition-time)** to indicate that they can be used at any point of a business logic function lifecycle to extend highly flexible and precise control.
-
-```js
-/* handler.js - configure and attach hooks to business logic steps with hookEachPipe */
-import { pipeHookEach, eventLogger, eventTimer } from '@opbi/hooks';
-import { UserProfileAPI, SubscriptionAPI } from './api.js';
-
-export const userCancelSubscription = async pipeHookEach(
-  // all with default configuration applied to each step below
-  eventLogger(), eventTimer() 
-)(
-  UserProfileAPI.getSubscription, 
-  // precise control with step only hook
-  chain(
-    errorRetry({ condition: e => e.type === 'TimeoutError' })
-  )(SubscriptionAPI.cancel),
-);
-```
 
 ---
 ### Integration
